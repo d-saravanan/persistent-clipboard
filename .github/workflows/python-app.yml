@@ -51,17 +51,21 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
-          const tags = await github.repos.listTags({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-          }).catch(err => { return { data: [] }; });
+          if (github.repos) {
+            const tags = await github.repos.listTags({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            }).catch(err => { return { data: [] }; });
     
-          if (!tags || !tags.data || tags.data.length === 0) {
-            return 'v1.0.0';
+            if (!tags || !tags.data || tags.data.length === 0) {
+              return 'v1.0.0';
+            } else {
+              const latestTag = tags.data[0].name;
+              const [major, minor, patch] = latestTag.replace('v', '').split('.').map(Number);
+              return `v${major}.${minor}.${patch + 1}`;
+            }
           } else {
-            const latestTag = tags.data[0].name;
-            const [major, minor, patch] = latestTag.replace('v', '').split('.').map(Number);
-            return `v${major}.${minor}.${patch + 1}`;
+            return 'v1.0.0';
           }
     - name: Create Release
       id: create_release
