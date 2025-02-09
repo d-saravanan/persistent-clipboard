@@ -31,7 +31,7 @@ jobs:
         run: pyinstaller --onefile --name persistent_clipboard main.py
 
       - name: Upload Windows executable
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: persistent_clipboard.exe
           path: dist/persistent_clipboard.exe
@@ -62,7 +62,7 @@ jobs:
           pyinstaller --onefile --windowed --name persistent_clipboard main.py
 
       - name: Upload linux executable
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: persistent_clipboard
           path: dist/persistent_clipboard
