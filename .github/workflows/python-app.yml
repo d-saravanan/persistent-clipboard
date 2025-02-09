@@ -46,23 +46,15 @@ jobs:
         name: executable
         path: .
 
-    - name: Install Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
-
-    - name: Install octokit/rest
-      run: npm install @octokit/rest
-
     - name: Get previous version
       id: get_version
       uses: actions/github-script@v6
       with:
         script: |
-          const { Octokit } = require("@octokit/rest");
-          const octokit = new Octokit({ auth: process.env.persistent_clipboard_token });
+          # const { Octokit } = require("@octokit/rest");
+          # const octokit = new Octokit({ auth: process.env.persistent_clipboard_token });
           
-          const tags = await octokit.repos.listTags({
+          const tags = await github.repos.listTags({
             owner: context.repo.owner,
             repo: context.repo.repo,
           }).catch(err => { return { data: [] }; });
