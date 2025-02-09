@@ -62,7 +62,15 @@ jobs:
             } else {
               const latestTag = tags.data[0].name;
               const [major, minor, patch] = latestTag.replace('v', '').split('.').map(Number);
-              return `v${major}.${minor}.${patch + 1}`;
+              let newTag = `v${major}.${minor}.${patch + 1}`;
+      
+              // Check if the new tag already exists
+              const existingTag = tags.data.find(tag => tag.name === newTag);
+              if (existingTag) {
+                newTag = `v${major}.${minor}.${patch + 2}`;
+              }
+      
+              return newTag;
             }
           } else {
             return 'v1.0.0';
