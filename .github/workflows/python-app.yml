@@ -51,21 +51,27 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
+          console.log(`has repos: ${github.repos}`);
           if (github.repos) {
             const tags = await github.repos.listTags({
               owner: context.repo.owner,
               repo: context.repo.repo,
             }).catch(err => { return { data: [] }; });
+
+            console.log(`tags: ${tags}`);
     
             if (!tags || !tags.data || tags.data.length === 0) {
               return 'v1.0.0';
             } else {
               const latestTag = tags.data[0].name;
+              console.log(`latest tag name: ${latestTag}`);
               const [major, minor, patch] = latestTag.replace('v', '').split('.').map(Number);
               let newTag = `v${major}.${minor}.${patch + 1}`;
+
+              console.log(`New tag: ${newTag}`);
       
               // Check if the new tag already exists
-              const existingTag = tags.data.find(tag => tag.name === newTag);
+              const existingTag = tags.data.find(tag => tag.name == newTag);
               if (existingTag) {
                 newTag = `v${major}.${minor}.${patch + 2}`;
               }
