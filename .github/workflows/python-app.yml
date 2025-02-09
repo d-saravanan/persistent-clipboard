@@ -1,65 +1,67 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-
-name: Python application
+name: Build and Release
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    tags:
+      - 'v*.*.*'
 
 jobs:
   build:
-
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
       with:
-        python-version: "3.10"
-        architecture: "x64"
+        python-version: '3.x'
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install flake8
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Run PyInsatller
-      run: |
-        python -m PyInstaller persistent_clipboard.spec
-    - uses: actions/upload-artifact@v2:
+    - name: Install pyinstaller
+      run: pip install pyinstaller 
+
+    - name: Build executable
+      run: pyinstaller --onefile main.py
+
+    - name: Archive build output
+      uses: actions/upload-artifact@v3
       with:
-        name: Windows Persistent clipboard
-        path: dist/persistent_clipboard.exe
+        name: executable
+        path: dist/persistent-clipboard.exe
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: executable
+        path: .
+
     - name: Create Release
-      id: do_release
+      id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.event.head_commit.message }}
-        release_name: ${{ github.event.head_commit.message }}
-        overwrite: true
-        body: |
-          Release Version v1.0.0
-    - Upload Release Asset
-      id: upload-release-asset
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{steps.do_release.outputs.upload_url}}
-        asset_path: dist/persistent_clipboard.exe
-        asset_name: Persistent-Clipboard.exe
-        asset_content_type: application/zip
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/persistent-clipboard.exe
+        asset_name: persistent-clipboard.exe
+        asset_content_type: application/octet-stream
