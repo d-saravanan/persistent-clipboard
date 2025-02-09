@@ -46,52 +46,14 @@ jobs:
         name: executable
         path: .
 
-    - name: Get previous version
-      id: get_version
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const { GitHub } = require('@actions/github');
-          github = GitHub.getOctokit(process.env.GITHUB_TOKEN);
-    
-          console.log(`has repos: ${github.repos}`);
-          if (github.repos) {
-            const tags = await github.repos.listTags({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            }).catch(err => { return { data: [] }; });
-    
-            console.log(`tags: ${tags}`);
-      
-            if (!tags || !tags.data || tags.data.length === 0) {
-              return 'v1.0.0';
-            } else {
-              const latestTag = tags.data[0].name;
-              console.log(`latest tag name: ${latestTag}`);
-              const [major, minor, patch] = latestTag.replace('v', '').split('.').map(Number);
-              let newTag = `v${major}.${minor}.${patch + 1}`;
-    
-              console.log(`New tag: ${newTag}`);
-      
-              // Check if the new tag already exists
-              const existingTag = tags.data.find(tag => tag.name == newTag);
-              if (existingTag) {
-                newTag = `v${major}.${minor}.${patch + 2}`;
-              }
-      
-              return newTag;
-            }
-          } else {
-            return 'v1.0.0';
-          }
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.persistent_clipboard_token }}
       with:
-        tag_name: ${{ steps.get_version.outputs.result  }}
-        release_name: Release ${{ steps.get_version.outputs.result  }}
+        tag_name: ${{ github.ref  }}
+        release_name: Release ${{ github.ref }}
         draft: false
         prerelease: false
 
