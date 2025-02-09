@@ -52,7 +52,7 @@ jobs:
       with:
         script: |
           const { GitHub } = require('@actions/github');
-          const github = GitHub.getOctokit(process.env.GITHUB_TOKEN);
+          github = GitHub.getOctokit(process.env.GITHUB_TOKEN);
     
           console.log(`has repos: ${github.repos}`);
           if (github.repos) {
