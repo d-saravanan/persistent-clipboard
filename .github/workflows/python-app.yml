@@ -51,15 +51,18 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
+          const { GitHub } = require('@actions/github');
+          const github = GitHub.getOctokit(process.env.GITHUB_TOKEN);
+    
           console.log(`has repos: ${github.repos}`);
           if (github.repos) {
             const tags = await github.repos.listTags({
               owner: context.repo.owner,
               repo: context.repo.repo,
             }).catch(err => { return { data: [] }; });
-
-            console.log(`tags: ${tags}`);
     
+            console.log(`tags: ${tags}`);
+      
             if (!tags || !tags.data || tags.data.length === 0) {
               return 'v1.0.0';
             } else {
@@ -67,7 +70,7 @@ jobs:
               console.log(`latest tag name: ${latestTag}`);
               const [major, minor, patch] = latestTag.replace('v', '').split('.').map(Number);
               let newTag = `v${major}.${minor}.${patch + 1}`;
-
+    
               console.log(`New tag: ${newTag}`);
       
               // Check if the new tag already exists
