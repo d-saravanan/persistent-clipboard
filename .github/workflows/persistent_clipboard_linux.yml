@@ -6,7 +6,7 @@ on:
       - 'v*.*.*'
 
 jobs:
-  linux-build:
+  linuxbuild:
     runs-on: ubuntu-latest
 
     steps:
