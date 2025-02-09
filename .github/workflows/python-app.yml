@@ -45,7 +45,15 @@ jobs:
       with:
         name: executable
         path: .
-        
+
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - name: Install octokit/rest
+      run: npm install @octokit/rest
+
     - name: Get previous version
       id: get_version
       uses: actions/github-script@v6
