@@ -55,15 +55,14 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
           }).catch(err => { return { data: [] }; });
-          
-          if (tags.data.length === 0) {
+    
+          if (!tags || !tags.data || tags.data.length === 0) {
             return 'v1.0.0';
           } else {
             const latestTag = tags.data[0].name;
             const [major, minor, patch] = latestTag.replace('v', '').split('.').map(Number);
             return `v${major}.${minor}.${patch + 1}`;
           }
-
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
