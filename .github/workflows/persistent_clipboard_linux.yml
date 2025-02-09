@@ -6,7 +6,7 @@ on:
       - 'v*.*.*'
 
 jobs:
-  linuxbuild:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,23 +28,23 @@ jobs:
         run: |
           pyinstaller --onefile --windowed --name persistent_clipboard main.py 
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.persistent_clipboard_token }}
-      with:
-        tag_name: ${{ github.ref  }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.persistent_clipboard_token }}
+        with:
+          tag_name: ${{ github.ref  }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
 
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.persistent_clipboard_token }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/persistent_clipboard.exe
-        asset_name: persistent_clipboard.exe
-        asset_content_type: application/octet-stream
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.persistent_clipboard_token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/persistent_clipboard.exe
+          asset_name: persistent_clipboard.exe
+          asset_content_type: application/octet-stream
