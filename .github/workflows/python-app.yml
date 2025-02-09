@@ -36,8 +36,8 @@ jobs:
     - name: Download artifact
       uses: actions/download-artifact@v4
       with:
-        name: executable
-        path: .
+        name: persistent_clipboard
+        path: ./dist/persistent_clipboard.exe
 
     - name: Create Release
       id: create_release
