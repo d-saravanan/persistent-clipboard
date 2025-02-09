@@ -54,7 +54,7 @@ jobs:
           const tags = await github.repos.listTags({
             owner: context.repo.owner,
             repo: context.repo.repo,
-          });
+          }).catch(err => { return { data: [] }; });
           if (tags.data.length === 0) {
             return 'v1.0.0';
           } else {
