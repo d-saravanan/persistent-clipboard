@@ -1,4 +1,4 @@
-name: Build and Release Persistent Clipboard Source
+name: Build and Release Windows Version of Persistent Clipboard
 
 on:
   push:
